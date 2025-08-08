@@ -22,7 +22,7 @@ server {
 # authoritative_region = "${auth_region}"  
   bootstrap_expect = 3
   server_join {
-    retry_join     = [ "100.100.0.5", "100.100.0.6", "100.100.0.7" ] 
+    retry_join     = [ "100.100.0.10", "100.100.0.11", "100.100.0.12" ] 
     retry_max      = 5
     retry_interval = "15s"
   }
