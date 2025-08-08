@@ -88,53 +88,6 @@ resource "tls_locally_signed_cert" "nomad" {
     ]
 }
 
-resource "tls_private_key" "consul" {
-    count = var.config.server_replicas
-    algorithm = "RSA"
-    rsa_bits  = "4096"
-}
-
-# Create the request to sign the cert with our CA
-resource "tls_cert_request" "consul" {
-    count = "${var.config.server_replicas}"
-    private_key_pem = "${element(tls_private_key.consul.*.private_key_pem, count.index)}"
-
-    dns_names = [
-        "consul",
-        "consul.local",
-        "localhost",
-        "nomad-${var.config.datacenter_name}-${count.index}",
-        "127.0.0.1",
-    ]
-
-    ip_addresses = [
-        "127.0.0.1",
-    ]
-
-    subject {
-        common_name  = "consul.local"
-        organization = var.config.organization.name
-    }
-}
-
-resource "tls_locally_signed_cert" "consul" {
-    count = var.config.server_replicas
-    cert_request_pem = "${element(tls_cert_request.consul.*.cert_request_pem, count.index)}"
-
-    ca_private_key_pem = file("${var.config.private_key_pem}")
-    ca_cert_pem        = file("${var.config.certificate_pem}")
-
-    validity_period_hours = 8760
-
-    allowed_uses = [
-        "cert_signing",
-        "client_auth",
-        "digital_signature",
-        "key_encipherment",
-        "server_auth",
-    ]
-}
-
 resource "random_id" "nomad_encryption_key" {
     byte_length = 32
 }
